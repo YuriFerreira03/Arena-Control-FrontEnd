@@ -187,8 +187,8 @@ export default function AdmCadastroScreen({ navigation }: any) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
-        onPress={handleBack} // ⬅️  sem handleSubmit
-        disabled={isSubmitting} // opcional: desabilita só durante salvamento
+        onPress={handleBack}
+        disabled={isSubmitting}
       >
         <Text style={styles.buttonText}>
           {isSubmitting ? "Voltando..." : "Voltar"}

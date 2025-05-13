@@ -29,9 +29,9 @@ const useBLE = () => {
         CHARACTERISTIC_UUID,
         base64Command
       );
-      console.log("📤 Comando enviado:", command);
+      console.log("Comando enviado:", command);
     } catch (error) {
-      console.error("❌ Erro ao enviar comando:", error);
+      console.error("Erro ao enviar comando:", error);
       setErrorMessage("Erro ao enviar comando.");
     }
   };
@@ -39,7 +39,7 @@ const useBLE = () => {
   const stopScan = () => {
     bleManager.stopDeviceScan();
     setScanning(false);
-    console.log("🛑 Escaneamento interrompido.");
+    console.log("Escaneamento interrompido.");
   };
 
   const requestPermissions = async (): Promise<boolean> => {
@@ -106,7 +106,7 @@ const useBLE = () => {
 
   const connectToDevice = async (device: Device) => {
     try {
-      console.log("🔗 Conectando ao dispositivo:", device.name);
+      console.log("Conectando ao dispositivo:", device.name);
 
       const connectedDevice = await bleManager.connectToDevice(device.id, {
         autoConnect: true,
@@ -119,16 +119,16 @@ const useBLE = () => {
       });
       setSelectedDevice(connectedDevice);
 
-      console.log("✅ Conectado:", connectedDevice.name);
+      console.log("Conectado:", connectedDevice.name);
 
       await connectedDevice.writeCharacteristicWithResponseForService(
         SERVICE_UUID,
         CHARACTERISTIC_UUID,
         btoa("")
       );
-      console.log("📤 Comando de teste enviado após conexão");
+      console.log("Comando de teste enviado após conexão");
     } catch (error) {
-      console.error("❌ Erro ao conectar ou enviar comando:", error);
+      console.error("Erro ao conectar ou enviar comando:", error);
       setErrorMessage("Erro ao conectar ou enviar comando.");
     }
   };
