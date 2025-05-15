@@ -12,7 +12,7 @@ import * as Font from "expo-font"; // <-- importar o carregador de fontes
 import { Ionicons } from "@expo/vector-icons"; // <-- se estiver usando ícones
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState("PlacarEletronico");
+  const [currentScreen, setCurrentScreen] = useState("Login");
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false); // <-- estado de fontes carregadas
 

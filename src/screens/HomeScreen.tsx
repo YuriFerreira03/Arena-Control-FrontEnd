@@ -17,8 +17,10 @@ interface HomeScreenProps {
   user: { username: string; e_adm?: boolean } | null;
 }
 
+
 export default function HomeScreen({ navigation, user }: HomeScreenProps) {
   const isAdmin = user?.e_adm === true;
+  
 
   /* ------------ 2. lista de botões ----------------- */
   const buttons = useMemo(() => {
