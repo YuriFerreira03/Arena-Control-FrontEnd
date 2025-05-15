@@ -79,9 +79,9 @@ useEffect(() => {
 
     if (token) {
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("✅ Token carregado no header:", token);
+      console.log("Token carregado no header:", token);
     } else {
-      console.warn("⚠️ Nenhum token encontrado");
+      console.warn("Nenhum token encontrado");
     }
 
     loadUsers(); // só chama depois de setar o token
