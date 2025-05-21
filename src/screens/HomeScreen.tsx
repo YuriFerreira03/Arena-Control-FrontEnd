@@ -103,12 +103,14 @@ export default function HomeScreen({ navigation, user }: HomeScreenProps) {
 
         {/* grid de botões */}
         <View style={styles.container1}>
-<View style={styles.welcomeBox}>
-  <Text style={styles.bv1}>
-    <Text style={styles.brandLeft}>Bem-vindo, </Text>
-    <Text style={styles.brandRight}>{user?.username ?? "Convidado"}!</Text>
-  </Text>
-</View>
+          <View style={styles.welcomeBox}>
+            <Text style={styles.bv1}>
+              <Text style={styles.brandLeft}>Bem-vindo, </Text>
+              <Text style={styles.brandRight}>
+                {user?.username ?? "Convidado"}!
+              </Text>
+            </Text>
+          </View>
           <View style={styles.buttonGrid}>
             {buttons.map((btn) => (
               <TouchableOpacity
@@ -157,7 +159,9 @@ const styles = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
   },
-  brandLeft: { /* se quiser cores diferentes no texto */ },
+  brandLeft: {
+    /* se quiser cores diferentes no texto */
+  },
   brandRight: {
     color: "#C8FF57",
   },
@@ -177,7 +181,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#003366",
     width: "48%",
-    aspectRatio: 1,   // quadrado
+    aspectRatio: 1, // quadrado
     marginBottom: 50,
     borderRadius: 12,
     justifyContent: "center",
@@ -191,17 +195,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "center",
   },
-welcomeBox: {
-  backgroundColor: "#003366",
-  width: "100%",
-  aspectRatio: 3,     // largura 2× altura
-  marginTop: 30,
-  marginBottom: 40,
-  borderRadius: 12,
-  justifyContent: "center",
-  alignItems: "center",
-  elevation: 4,
-},
+  welcomeBox: {
+    backgroundColor: "#003366",
+    width: "100%",
+    aspectRatio: 3, // largura 2× altura
+    marginTop: 30,
+    marginBottom: 40,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
+  },
 
   bv1: {
     fontSize: 24,

@@ -1,4 +1,3 @@
-// src/screens/AdmCadastroScreen.tsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -6,17 +5,22 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  FlatList,
   Alert,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { TextInput, Checkbox } from "react-native-paper";
+import { TextInput, Checkbox, DataTable, IconButton } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import API from "../service/api";
 import { colors } from "../theme/colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Header from "../components/Header";
 
+/* -------------------------------------------------------------------------- */
+/*                                Validation                                  */
+/* -------------------------------------------------------------------------- */
 
 const signupSchema = yup.object({
   username: yup.string().required("Usuário é obrigatório"),
@@ -30,6 +34,10 @@ const signupSchema = yup.object({
   e_adm: yup.boolean(),
 });
 
+/* -------------------------------------------------------------------------- */
+/*                                   Types                                    */
+/* -------------------------------------------------------------------------- */
+
 type FormData = {
   username: string;
   senha: string;
@@ -40,6 +48,7 @@ type FormData = {
 };
 
 export default function AdmCadastroScreen({ navigation }: any) {
+  /* --------------------------------- form --------------------------------- */
   const {
     control,
     handleSubmit,
@@ -57,63 +66,53 @@ export default function AdmCadastroScreen({ navigation }: any) {
     },
   });
 
+  /* ---------------------------------- data --------------------------------- */
   const [users, setUsers] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  // Carrega quem eu criei
+  /* ----------------------------- API utilities ----------------------------- */
   const loadUsers = async () => {
     try {
-      console.log("GET /usuario/created");
       const res = await API.get("/usuario/created");
-      console.log("Usuários carregados:", res.data);
       setUsers(res.data);
-    } catch {
-      console.error("Erro ao carregar usuários:", err?.response?.data || err.message);
-      Alert.alert("Erro", "Não foi possível carregar usuários.");
+    } catch (err: any) {
+      Alert.alert(
+        "Erro",
+        err?.response?.data || "Não foi possível carregar usuários."
+      );
     }
   };
 
-useEffect(() => {
-  const initialize = async () => {
-    const token = await AsyncStorage.getItem("token");
+  useEffect(() => {
+    const initialize = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token)
+        API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      loadUsers();
+    };
+    initialize();
+  }, []);
 
-    if (token) {
-      API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("Token carregado no header:", token);
-    } else {
-      console.warn("Nenhum token encontrado");
-    }
-
-    loadUsers(); // só chama depois de setar o token
-  };
-
-  initialize();
-}, []);
-
-  // Cria ou atualiza
+  /* ------------------------------- CRUD logic ------------------------------ */
   const onSubmit = async (data: FormData) => {
     try {
-      console.log(editingId ? "PUT /usuario" : "POST /usuario");
-      console.log("Payload:", data);
       if (editingId) {
-        const res = await API.put(`/usuario/${editingId}`, data);
-        console.log("Atualizado:", res.data);
+        await API.put(`/usuario/${editingId}`, data);
         Alert.alert("Sucesso", "Usuário atualizado!");
       } else {
-        const res = await API.post("/usuario", data);
-        console.log("Criado:", res.data);
+        await API.post("/usuario", data);
         Alert.alert("Sucesso", "Usuário cadastrado!");
       }
-reset({
-  username: "",
-  senha: "",
-  matricula: "",
-  email: "",
-  telefone: "",
-  e_adm: false,
-});
-setEditingId(null);
-loadUsers();
+      reset({
+        username: "",
+        senha: "",
+        matricula: "",
+        email: "",
+        telefone: "",
+        e_adm: false,
+      });
+      setEditingId(null);
+      loadUsers();
     } catch (err: any) {
       Alert.alert(
         "Erro",
@@ -122,7 +121,6 @@ loadUsers();
     }
   };
 
-  // Preenche form para edição
   const handleEdit = (user: any) => {
     reset({
       username: user.username,
@@ -135,35 +133,44 @@ loadUsers();
     setEditingId(user.id_usr);
   };
 
-  // Exclui e recarrega lista
   const handleDelete = async (id: number) => {
     try {
-      console.log(" DELETE /usuario/" + id);
-      const res = await API.delete(`/usuario/${id}`);
+      await API.delete(`/usuario/${id}`);
       loadUsers();
-    } catch {
-      console.error("Erro ao excluir:", err?.response?.data || err.message);
+    } catch (err: any) {
       Alert.alert("Erro", "Não foi possível excluir o usuário.");
     }
   };
 
-  // Cancela edição
   const cancelEdit = () => {
-    reset();
+    reset({
+      username: "",
+      senha: "",
+      matricula: "",
+      email: "",
+      telefone: "",
+      e_adm: false,
+    });
     setEditingId(null);
   };
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Render                                   */
+  /* -------------------------------------------------------------------------- */
+
   return (
-  <FlatList
-    contentContainerStyle={styles.container}
-    // monta o form como cabeçalho da lista
-    ListHeaderComponent={() => (
-      <>
+    <View style={styles.screen}>
+      <Header title="Gerenciar usuários" navigation={navigation} />
+
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 50 }}
+      >
         <Text style={styles.title}>
           {editingId ? "Editar Usuário" : "Cadastro de Novo Usuário"}
         </Text>
 
-        {/* Usuário */}
+        {/* ----------------------------- Form fields ----------------------------- */}
         <Controller
           control={control}
           name="username"
@@ -182,7 +189,6 @@ loadUsers();
           <Text style={styles.error}>{errors.username.message}</Text>
         )}
 
-        {/* Senha */}
         <Controller
           control={control}
           name="senha"
@@ -202,7 +208,6 @@ loadUsers();
           <Text style={styles.error}>{errors.senha.message}</Text>
         )}
 
-        {/* Matrícula */}
         <Controller
           control={control}
           name="matricula"
@@ -221,7 +226,6 @@ loadUsers();
           <Text style={styles.error}>{errors.matricula.message}</Text>
         )}
 
-        {/* E-mail */}
         <Controller
           control={control}
           name="email"
@@ -241,7 +245,6 @@ loadUsers();
           <Text style={styles.error}>{errors.email.message}</Text>
         )}
 
-        {/* Telefone */}
         <Controller
           control={control}
           name="telefone"
@@ -261,22 +264,29 @@ loadUsers();
           <Text style={styles.error}>{errors.telefone.message}</Text>
         )}
 
-        {/* Checkbox ADM */}
         <Controller
           control={control}
           name="e_adm"
           render={({ field: { onChange, value } }) => (
-            <Checkbox.Item
-              label="Administrador?"
-              status={value ? "checked" : "unchecked"}
-              onPress={() => onChange(!value)}
-              position="leading"
-              labelStyle={styles.checkboxLabel}
-            />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Checkbox
+                status={value ? "checked" : "unchecked"}
+                onPress={() => onChange(!value)}
+                color={colors.primary}
+              />
+              <Text style={{ fontSize: 16, color: colors.black }}>
+                Administrador: {value ? "Sim" : "Não"}
+              </Text>
+            </View>
           )}
         />
 
-        {/* Botões */}
         <View style={styles.buttonRow}>
           {editingId && (
             <TouchableOpacity
@@ -301,49 +311,142 @@ loadUsers();
             </Text>
           </TouchableOpacity>
         </View>
-      </>
-    )}
-    // dados e renderização dos itens
-    data={users}
-    keyExtractor={(u) => String(u.id_usr)}
-    ItemSeparatorComponent={() => <View style={styles.separator} />}
-    renderItem={({ item }) => (
-      <View style={styles.userRow}>
-        <Text>
-          {item.username} {item.e_adm ? "(ADM)" : ""}
-        </Text>
-        <View style={styles.actions}>
-          <TouchableOpacity onPress={() => handleEdit(item)}>
-            <Text style={styles.editText}>Editar</Text>
-          </TouchableOpacity>
-         <TouchableOpacity
-  onPress={() => {
-    Alert.alert(
-      "Confirmar exclusão",
-      `Tem certeza que deseja excluir "${item.username}"?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Excluir", style: "destructive", onPress: () => handleDelete(item.id_usr) },
-      ]
-    );
-  }}
->
-  <Text style={styles.deleteText}>Excluir</Text>
-</TouchableOpacity>
 
-        </View>
-      </View>
-    )}
-  />
-);
+        {/* ------------------------------- Table ------------------------------- */}
+        {users.length > 0 ? (
+          <DataTable style={styles.tableWrapper}>
+            <DataTable.Header>
+              <DataTable.Title style={{ flex: 2 }}>
+                <Text
+                  style={{ fontSize: 18, fontWeight: "bold", color: "#ffff" }}
+                >
+                  Usuário
+                </Text>
+              </DataTable.Title>
 
+              <DataTable.Title style={{ flex: 1 }}>
+                <Text
+                  style={{ fontSize: 18, fontWeight: "bold", color: "#fff" }}
+                >
+                  Perfil
+                </Text>
+              </DataTable.Title>
+
+              <DataTable.Title numeric style={{ flex: 1 }}>
+                <Text
+                  style={{ fontSize: 18, fontWeight: "bold", color: "#fff" }}
+                >
+                  Ações
+                </Text>
+              </DataTable.Title>
+            </DataTable.Header>
+
+            {users.map((u, idx) => (
+              <DataTable.Row key={u.id_usr}>
+                <DataTable.Cell
+                  style={[
+                    styles.cell,
+                    { flex: 2, justifyContent: "flex-start" },
+                  ]}
+                >
+                  <Text
+                    style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                  >
+                    {u.username}
+                  </Text>
+                </DataTable.Cell>
+
+                <DataTable.Cell style={[styles.cell, { flex: 1 }]}>
+                  <Text
+                    style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                  >
+                    {u.e_adm ? "ADM" : "Comum"}
+                  </Text>
+                </DataTable.Cell>
+                <View
+                  style={{ flexDirection: "row", gap: 2, marginRight: -20 }}
+                >
+                  <IconButton
+                    icon={() => (
+                      <MaterialIcons
+                        name="edit"
+                        size={24}
+                        color={colors.primary}
+                      />
+                    )}
+                    containerColor={"#E3F2FD"}
+                    onPress={() => handleEdit(u)}
+                  />
+                  <IconButton
+                    icon={() => (
+                      <MaterialIcons
+                        name="delete"
+                        size={24}
+                        color={"#FFFFFF"}
+                      />
+                    )}
+                    containerColor="#E53935"
+                    onPress={() =>
+                      Alert.alert(
+                        "Confirmar exclusão",
+                        `Tem certeza que deseja excluir \"${u.username}\"?`,
+                        [
+                          { text: "Cancelar", style: "cancel" },
+                          {
+                            text: "Excluir",
+                            style: "destructive",
+                            onPress: () => handleDelete(u.id_usr),
+                          },
+                        ]
+                      )
+                    }
+                  />
+                </View>
+              </DataTable.Row>
+            ))}
+          </DataTable>
+        ) : (
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 20,
+              color: colors.black,
+              marginTop: 50,
+              marginBottom: 40,
+              fontFamily: "Inter",
+              fontStyle: "normal",
+              fontWeight: "500",
+            }}
+          >
+            Não há usuários para editar.
+          </Text>
+        )}
+        <TouchableOpacity
+          style={styles.homeButton}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={styles.homeButtonText}>Voltar para Home</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   Styles                                   */
+/* -------------------------------------------------------------------------- */
+
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
   container: {
-    flexGrow: 1,
     padding: 24,
     backgroundColor: colors.white,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    flex: 1,
   },
   title: {
     fontSize: 22,
@@ -360,9 +463,13 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 16,
   },
+  error: {
+    color: "#E53935",
+    marginBottom: 8,
+  },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
     marginTop: 8,
   },
   button: {
@@ -374,30 +481,53 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   cancelButton: {
-    backgroundColor: "#AAA",
+    backgroundColor: "#E53935",
   },
   buttonText: {
-    color: colors.accent,
+    color: colors.white,
     fontSize: 16,
   },
-  separator: {
-    height: 1,
-    backgroundColor: "#DDD",
-    marginVertical: 8,
+  tableWrapper: {
+    marginTop: 35,
+    backgroundColor: "#003366", // azul com leve opacidade
+    borderRadius: 12,
+    width: "100%",
+    padding: 10,
+    borderColor: "#000",
+    borderStyle: "solid",
+    overflow: "hidden",
+    elevation: 4, // sombra mais destacada
+    shadowColor: "#000",
+    //cor da borda interna da tabela
+    borderWidth: 1,
+    //cor da sombra
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
-  userRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  rowAlt: {
+    backgroundColor: "#f0f0f0",
+  },
+  cell: {
+    borderRightWidth: 1,
+    borderColor: "#FFFFFF", // ou outra cor, tipo cinza claro '#CCCCCC'
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    justifyContent: "center",
     alignItems: "center",
   },
-  actions: {
-    flexDirection: "row",
+  homeButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 16,
   },
-  editText: {
-    color: colors.primary,
-    marginRight: 12,
-  },
-  deleteText: {
-    color: "red",
+  homeButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
