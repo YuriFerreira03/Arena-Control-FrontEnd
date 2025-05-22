@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   StatusBar,
   SafeAreaView,
   Alert,
@@ -51,19 +50,19 @@ export default function HomeScreen({ navigation, user }: HomeScreenProps) {
         id: 2,
         label: "Súmula",
         icon: "file-document-edit",
-        onPress: () => {},
+        onPress: () => navigation.navigate("Sumula"),
       },
       {
         id: 3,
         label: "Jogos",
         icon: "history",
-        onPress: () => {},
+        onPress: () => navigation.navigate("CreateGame"),
       },
       {
         id: 4,
         label: "Tabela",
         icon: "table-large",
-        onPress: () => {},
+        onPress: () => navigation.navigate("Table"),
       },
     ];
 
@@ -90,7 +89,7 @@ export default function HomeScreen({ navigation, user }: HomeScreenProps) {
       <Header title="Arena Control" />
 
       {/* barra de status */}
-      <StatusBar backgroundColor="#023E73" barStyle="light-content" />
+      <StatusBar backgroundColor="#003366" barStyle="light-content" />
 
       <View style={styles.container}>
         {/* cabeçalho */}
@@ -136,7 +135,7 @@ export default function HomeScreen({ navigation, user }: HomeScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#023E73",
+    backgroundColor: "#003366",
   },
   container: {
     flex: 1,

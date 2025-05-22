@@ -133,6 +133,22 @@ const useBLE = () => {
     }
   };
 
+  const disconnectFromDevice = async () => {
+  if (selectedDevice) {
+    try {
+      await selectedDevice.cancelConnection();
+      console.log("Dispositivo desconectado");
+    } catch (error) {
+      console.error("Erro ao desconectar:", error);
+    } finally {
+      setSelectedDevice(null);
+      setConnectedDevices((prev) =>
+        prev.filter((d) => d.id !== selectedDevice.id)
+      );
+    }
+  }
+};
+
   useEffect(() => {
     checkConnectedDevices();
     const subscription = bleManager.onStateChange((state) => {
@@ -161,6 +177,7 @@ const useBLE = () => {
     stopScan,
     requestPermissions,
     sendCommandToDevice,
+    disconnectFromDevice,
   };
 };
 

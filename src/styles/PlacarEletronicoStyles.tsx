@@ -1,331 +1,221 @@
+// styles/PlacarEletronicoStyles.ts
 import { StyleSheet } from "react-native";
+import { colors } from "../theme/colors"; // azul primário #003366
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
+  /* ─── Estrutura base ─── */
   container: {
     flex: 1,
-    backgroundColor: "#02253D",
-    padding: 8,
-    marginTop: 5,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 30,
-    color: "#003366", // azul escuro CEFET
-  },
-  mainContainer: {
-    flexDirection: "column",
-    justifyContent: "space-around",
-    alignItems: "flex-start",
-    marginTop: 10,
-  },
-  teamContainer: {
-    backgroundColor: "#06568F", // azul forte bonito
-    borderRadius: 20,
-    padding: 10,
-    margin: 10,
-    marginTop: 60,
-    marginRight: 50,
-    height: 280,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  circleButton: {
-    width: 120,
-    height: 50,
-    marginTop: -10,
-    borderRadius: 20,
-    backgroundColor: "#FFFFFF",
-    shadowOpacity: 0.8,
-    borderColor: "#003366",
-    borderWidth: 3,
-    shadowRadius: 4,
-    elevation: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 32,
-  },
-  circleButton1: {
-    width: 290,
-    height: 50,
-    borderRadius: 20,
-    marginTop: -10,
-    //cor vermelha
-    backgroundColor: "#02253D",
-    //contorno branco
-    borderWidth: 3,
-    borderColor: "#FFFFFF",
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  circleButton2: {
-    width: 100,
-    height: 50,
-    marginTop: -3,
-    marginLeft: 10,
-    borderRadius: 20,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#003366",
-    borderWidth: 3,
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  servico: {
-    width: "40%",
-    padding: 8,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 10,
-    marginTop: -10,
-    marginLeft: "31%",
-  },
-  teamName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    textAlign: "center",
-    marginBottom: 15,
-    marginRight: 220,
-  },
-  section: {
-    alignItems: "center",
-  },
-  info: {
-    fontSize: 17,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: -30,
-    marginBottom: 2,
-  },
-  info1: {
-    fontSize: 20,
-    marginTop: 4,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  info2: {
-    fontSize: 17,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: -3,
-    marginBottom: 2,
-  },
-  info3: {
-    fontSize: 17,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: -30,
-    marginBottom: 4,
-    marginLeft: 10,
-  },
-  placarResumoContainer: {
-    backgroundColor: "#06568F",
-    padding: 25,
-    marginHorizontal: 11,
-  },
-  resumoEquipe: {
-    backgroundColor: "#02253D",
-    borderColor: "#FFFFFF", // Cor da borda
-    borderWidth: 1, // Largura da borda
-    borderRadius: 15, // Bordas mais arredondadas
-    padding: 25, // Mais espaço interno (+10)
-    width: "70%", // Largura controlada (quando em linha)
-    minHeight: 200, // Altura mínima garantida
-    justifyContent: "center", // Centraliza conteúdo verticalmente
-    alignItems: "center", // Centraliza horizontalmente
-    marginRight: 100, // Espaço entre os resumos
-  },
-  resumoEquipe2: {
-    backgroundColor: "#02253D",
-    borderRadius: 15, // Bordas mais arredondadas
-    borderColor: "#FFFFFF", // Cor da borda
-    borderWidth: 1, // Largura da borda
-    padding: 25, // Mais espaço interno (+10)
-    width: "70%", // Largura controlada (quando em linha)
-    minHeight: 200, // Altura mínima garantida
-    justifyContent: "center", // Centraliza conteúdo verticalmente
-    alignItems: "center", // Centraliza horizontalmente
-  },
-  resumoEquipe1: {
-    backgroundColor: "#02253D",
-    borderRadius: 10,
-    padding: 15,
-    borderColor: "#FFFFFF", // Cor da borda
-    borderWidth: 1, // Largura da borda
-    marginTop: 10,
-  },
-  mainContainer1: {
-    marginTop: -10,
-  },
-  geralContainer: {
-    backgroundColor: "#06568F", // azul forte bonito
-    borderRadius: 20,
+    backgroundColor: "#FFF",
     padding: 20,
-    width: 300,
-    margin: 40,
-    marginTop: 580,
-    height: 180,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
   },
-  geralContainer1: {
-    backgroundColor: "#06568F", // azul forte bonito
-    borderRadius: 20,
-    padding: 20,
-    width: "97%",
-    marginLeft: 8,
-    margin: 40,
-    marginTop: 640,
-    height: 170,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  row: {
+
+  /* ─── Blocos das equipes ─── */
+  scoreRow: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
+  },
+  teamBlock: {
     width: "100%",
-    marginVertical: 8,
-  },
-  pointsTitle: {
-    fontSize: 19,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginTop: -40,
-    marginHorizontal: 10,
-  },
-  dropdownButton: {
-    backgroundColor: "#2196F3",
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: "flex-start",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  dropdownContainer: {
-    position: "absolute",
-    top: 120,
-    right: 20,
-    borderWidth: 5,
-    borderColor: "#FFFFFF",
-    backgroundColor: "#06568F",
-    borderRadius: 15,
-    width: "90%",
-    maxHeight: "80%",
-    zIndex: 998,
-    elevation: 5,
-  },
-  floatingButton: {
-    backgroundColor: "#06568F",
+    backgroundColor: "#F5F7FA",
+    borderRadius: 16,
     padding: 12,
-    borderRadius: 8,
-    borderColor: "#FFFFFF",
-    borderWidth: 2,
-    minWidth: 110,
+    marginTop: -10,
     alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  floatingButton1: {
-    backgroundColor: "#FF0000",
-    padding: 12,
-    borderRadius: 8,
-    borderColor: "#FFFFFF",
-    borderWidth: 2,
-    minWidth: 110,
+  teamTitle: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  pointsDisplay: {
+    fontSize: 48,
+    fontWeight: "700",
+    color: colors.primary,
+  },
+
+  /* Pontos +1 / -1 */
+  pointsButtons: { flexDirection: "row", marginBottom: 8 },
+  bigButton: {
+    backgroundColor: colors.primary,
+    width: 100,
+    height: 80,
+    borderRadius: 40,
     alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    justifyContent: "center",
+    marginHorizontal: 6,
   },
-  scrollContent: {
-    padding: 15,
+  bigBtnLabel: { color: "#FFF", fontSize: 22, fontWeight: "700" },
+
+  /* Set/Faltas | Serviço | P. Tempo */
+  miscRow: { flexDirection: "row", marginTop: 8 },
+  smallCircle: {
+    width: 40, // antes 28
+    height: 40, // antes 28
+    borderRadius: 20, // antes 14
+    marginHorizontal: 4,
+    backgroundColor: colors.primary,
   },
+  miscLabel: { fontSize: 12, color: colors.primary, marginTop: 4 },
+
+  /* ─── Bloco Cronômetro e Controles Gerais ─── */
+  generalBlock: { alignItems: "center", marginTop: 5 },
+  timer: { fontSize: 48, fontWeight: "700", color: colors.primary },
+  generalRow: { flexDirection: "row", marginTop: 12 },
+  generalCircle: {
+    width: 100,
+    height: 80,
+    borderRadius: 25,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 6,
+  },
+  generalLabel: { color: "#FFF", textAlign: "center", fontWeight: "600" },
+
+  /* Botão PRESET */
+  presetButton: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+  },
+  presetLabel: { color: "#FFF", fontWeight: "600" },
+
+  /* ─── Overlay genérico ─── */
   overlay: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(2, 37, 61, 0.96)", // Azul #02253D com 70% de opacidade
-    zIndex: 997, // Abaixo do dropdown mas acima de outros elementos
+    backgroundColor: "rgba(1, 13, 35, 0.84)",
   },
-  buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "104%",
-    height: 50,
-    marginVertical: 3,
-    marginTop: 8,
+
+  /* ─── Menu lateral ─── */
+  sideMenu: {
     position: "absolute",
-    top: 5,
-    zIndex: 999,
+    top: 0,
+    right: 0,
+    width: "70%",
+    height: "100%",
+    backgroundColor: "#FFF",
+    paddingTop: 60,
+    paddingHorizontal: 20,
   },
-  dropdownItem: {
-    padding: 40,
+  menuItem: {
+    paddingVertical: 12,
+    backgroundColor: "#FFF",
+    borderRadius: 12,
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
+    marginTop: 100,
+    width: "80%",
+    alignSelf: "center",
+    justifyContent: "center",
+    marginBottom: -80,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  dropdownItemSelected: {
-    backgroundColor: "#02253D",
+
+  menuText: {
+    fontSize: 15,
+    color: colors.primary,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
-  confirmButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: "#2196F3",
-    borderRadius: 5,
+  generalCircle1: {
+    width: 210,
+    height: 80,
+    borderRadius: 25,
+    //colocar com aul porem com um efeito para sabeer
+    backgroundColor: colors.primary,
     alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 6,
   },
-  circleButtonp: {
-    width: 30,
-    height: 30,
-    marginTop: -69,
-    marginLeft: 330,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    shadowOpacity: 0.8,
-    borderColor: "#003366",
-    borderWidth: 3,
+
+  /* ─── Modal Preset ─── */
+  presetBox: {
+    position: "absolute",
+    top: "30%",
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#F5F7FA", // igual aos cards e menus
+    borderRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    justifyContent: "center",
+  },
+
+  presetOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#003366",
     alignItems: "center",
-    marginBottom: 32,
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+
+  presetSelected: {
+    backgroundColor: "#D7E8FF",
+    borderColor: colors.primary,
+    borderWidth: 2,
+    borderRadius: 8,
+  },
+
+  confirmButton: {
+    backgroundColor: colors.white,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+
+  miscButton: {
+    width: 105,
+    height: 70,
+    borderRadius: 30,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 4,
+  },
+  miscBtnLabel: {
+    color: "#FFF",
+    fontWeight: "700",
+    fontSize: 14,
+    alignSelf: "center",
+  },
+
+  iconInfo: {
+    color: "#FFF",
+    fontSize: 25,
+    fontWeight: "600",
+    // fontStyle: "italic",
+    marginTop: 10,
+    marginBottom: 20,
+    marginLeft: -280,
+    textAlign: "center",
   },
 });
-
-export default styles;

@@ -1,10 +1,16 @@
 // src/components/Header.tsx
 import React from "react";
-import { View, Text, Image, StyleSheet, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 
 export default function Header() {
   const { width } = useWindowDimensions();
-  const logoSize = Math.min(90, width * 0.9); 
+  const logoSize = Math.min(90, width * 0.9);
 
   return (
     <View style={styles.container}>
@@ -36,8 +42,8 @@ const styles = StyleSheet.create({
 
   // novo estilo aninhado
   brand: {
-    fontSize: 30,           // grande e chamativo
-    letterSpacing: 1,       // lembra dígitos de placar
+    fontSize: 30, // grande e chamativo
+    letterSpacing: 1, // lembra dígitos de placar
     fontFamily: "monospace",
     marginBottom: 16,
     marginTop: 18,
@@ -45,13 +51,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   brandLeft: {
-    color: "#FFFFFF",       // “Arena” em branco
+    color: "#FFFFFF", // “Arena” em branco
     textShadowColor: "#002B55",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
   brandRight: {
-    color: "#C8FF57",       // “Control” em verde-limão
+    color: "#C8FF57", // “Control” em verde-limão
     textShadowColor: "#044B97",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,

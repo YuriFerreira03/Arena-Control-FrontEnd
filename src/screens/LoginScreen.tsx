@@ -1,5 +1,13 @@
 import React from "react";
-import { Image, View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  Image,
+  View,
+  TouchableOpacity,
+  Text,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -39,65 +47,73 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require("../../assets/logoHD.png")} style={styles.logo} />
-      <Text style={styles.brand}>
-        <Text style={styles.brandLeft}>Arena</Text>
-        <Text style={styles.brandRight}>Control</Text>
-      </Text>
-
-      <View style={styles.card}>
-        {/* Usuário */}
-        <Controller
-          control={control}
-          name="username"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Usuário"
-              mode="outlined"
-              value={value}
-              onChangeText={onChange}
-              error={!!errors.username}
-              style={styles.input}
-              outlineStyle={{ borderWidth: 2 }}
-              selectionColor={colors.text}
-            />
-          )}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "android" ? "height" : "padding"}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/logoHD.png")}
+          style={styles.logo}
         />
-        {errors.username && (
-          <Text style={styles.error}>{errors.username.message}</Text>
-        )}
+        <Text style={styles.brand}>
+          <Text style={styles.brandLeft}>Arena</Text>
+          <Text style={styles.brandRight}>Control</Text>
+        </Text>
 
-        {/* Senha */}
-        <Controller
-          control={control}
-          name="senha"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Senha"
-              mode="outlined"
-              secureTextEntry
-              value={value}
-              onChangeText={onChange}
-              error={!!errors.senha}
-              style={styles.input}
-              outlineStyle={{ borderWidth: 2 }}
-              selectionColor={colors.text}
-            />
+        <View style={styles.card}>
+          {/* Usuário */}
+          <Controller
+            control={control}
+            name="username"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Usuário"
+                mode="outlined"
+                value={value}
+                onChangeText={onChange}
+                error={!!errors.username}
+                style={styles.input}
+                outlineStyle={{ borderWidth: 2 }}
+                selectionColor={colors.text}
+              />
+            )}
+          />
+          {errors.username && (
+            <Text style={styles.error}>{errors.username.message}</Text>
           )}
-        />
-        {errors.senha && (
-          <Text style={styles.error}>{errors.senha.message}</Text>
-        )}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
+          {/* Senha */}
+          <Controller
+            control={control}
+            name="senha"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Senha"
+                mode="outlined"
+                secureTextEntry
+                value={value}
+                onChangeText={onChange}
+                error={!!errors.senha}
+                style={styles.input}
+                outlineStyle={{ borderWidth: 2 }}
+                selectionColor={colors.text}
+              />
+            )}
+          />
+          {errors.senha && (
+            <Text style={styles.error}>{errors.senha.message}</Text>
+          )}
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text style={styles.buttonText}>Entrar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
