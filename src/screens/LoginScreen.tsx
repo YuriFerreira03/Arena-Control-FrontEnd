@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  buttonText: { color: colors.accent, fontSize: 18 },
+  buttonText: { color: colors.white, fontSize: 18 },
   link: {
     color: colors.primary,
     textAlign: "center",

@@ -13,9 +13,11 @@ import SumulaScreen from "./screens/SumulaScreen";
 import { BLEProvider } from "../src/hooks/BLEContext";
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider as PaperProvider } from "react-native-paper";
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState("CreateGame");
+  const [currentScreen, setCurrentScreen] = useState("Home");
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false); // <-- estado de fontes carregadas
 
@@ -38,38 +40,46 @@ const App = () => {
   if (!fontsLoaded) return null; // <-- evita renderizar antes de carregar fontes
 
   return (
-    <BLEProvider>
-      <View style={styles.container}>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="light-content"
-        />
-        <View style={styles.topSection}>
-          {currentScreen === "Home" && (
-            <HomeScreen navigation={navigation} user={user} />
-          )}
-          {currentScreen === "ConnectionBT" && (
-            <ConnectionBT navigation={navigation} />
-          )}
-          {currentScreen === "PlacarEletronico" && (
-            <PlacarEletronico navigation={navigation} />
-          )}
-          {currentScreen === "Login" && <LoginScreen navigation={navigation} />}
-          {currentScreen === "AdmCadastro" && (
-            <AdmCadastroScreen navigation={navigation} />
-          )}
-          {currentScreen === "Table" && <TableScreen navigation={navigation} />}
-          {currentScreen === "CreateGame" && (
-            <CreateGameScreen navigation={navigation} />
-          )}
-          {currentScreen === "Sumula" && (
-            <SumulaScreen navigation={navigation} />
-          )}
-        </View>
-        <View style={styles.bottomSection} />
-      </View>
-    </BLEProvider>
+    <SafeAreaProvider>
+      <PaperProvider>
+        <BLEProvider>
+          <View style={styles.container}>
+            <StatusBar
+              translucent
+              backgroundColor="transparent"
+              barStyle="light-content"
+            />
+            <View style={styles.topSection}>
+              {currentScreen === "Home" && (
+                <HomeScreen navigation={navigation} user={user} />
+              )}
+              {currentScreen === "ConnectionBT" && (
+                <ConnectionBT navigation={navigation} />
+              )}
+              {currentScreen === "PlacarEletronico" && (
+                <PlacarEletronico navigation={navigation} />
+              )}
+              {currentScreen === "Login" && (
+                <LoginScreen navigation={navigation} />
+              )}
+              {currentScreen === "AdmCadastro" && (
+                <AdmCadastroScreen navigation={navigation} />
+              )}
+              {currentScreen === "Table" && (
+                <TableScreen navigation={navigation} />
+              )}
+              {currentScreen === "CreateGame" && (
+                <CreateGameScreen navigation={navigation} />
+              )}
+              {currentScreen === "Sumula" && (
+                <SumulaScreen navigation={navigation} />
+              )}
+            </View>
+            <View style={styles.bottomSection} />
+          </View>
+        </BLEProvider>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 };
 

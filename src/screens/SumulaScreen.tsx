@@ -1,5 +1,5 @@
 // screens/SumulaScreen.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,16 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import { TextInput, Button, IconButton, HelperText } from "react-native-paper";
+import {
+  TextInput,
+  Button,
+  IconButton,
+  HelperText,
+  Menu,
+} from "react-native-paper";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
+import API from "../service/api";
+import { ActivityIndicator } from "react-native-paper";
 
 import Header from "../components/Header";
 import HomeButton from "../components/HomeButton";
@@ -53,12 +61,27 @@ interface FormData {
   notes: string;
 }
 
+interface JogoDto {
+  id_jogo: number;
+  equipe_a: string;
+  equipe_b: string;
+  data_hora: string;
+  nome?: string;
+}
+
 /* ───────────────────────────────────────────── */
 export default function SumulaScreen({ navigation }: SumulaScreenProps) {
+  const [jogos, setJogos] = useState<JogoDto[]>([]);
+  const [jogoSel, setJogoSel] = useState<JogoDto | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   /* ─── React-Hook-Form ─── */
   const {
     control,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -119,9 +142,46 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
   } = useFieldArray({ control, name: "playersB" });
 
   /* ─── submit ─── */
-  const onSubmit = (data: FormData) => {
-    console.log("Súmula:", data);
-    navigation.goBack();
+  const onSubmit = async (form: FormData) => {
+    try {
+      setSaving(true);
+      const payload = {
+        esporte: form.sport,
+        competicao: form.competition,
+        categoria: form.category,
+        local: form.venue,
+        cidade: form.city,
+        equipeA: form.teamA,
+        equipeB: form.teamB,
+        arbitro: form.referee,
+        observacoes: form.notes,
+        fk_jogo_id_jogo: jogoSel?.id_jogo ?? null,
+        periodos: form.periods.map((p) => ({
+          golsA: +p.goalsA || 0,
+          golsB: +p.goalsB || 0,
+          faltasA: +p.foulsA || 0,
+          faltasB: +p.foulsB || 0,
+          temposA: +p.timeoutsA || 0,
+          temposB: +p.timeoutsB || 0,
+        })),
+        jogadoresA: form.playersA,
+        jogadoresB: form.playersB,
+      };
+
+      await API.post("/sumula", payload, {
+        headers: {
+          /* Authorization: `Bearer ${token}` */
+        },
+      });
+      alert("Súmula salva!");
+      reset();
+      // navigation.goBack();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar súmula");
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* ─── helpers ─── */
@@ -286,6 +346,19 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
     </View>
   );
 
+  useEffect(() => {
+    const fetchJogos = async () => {
+      try {
+        const res = await API.get("/jogos");
+        setJogos(res.data); // ✔️ Aqui recebe a lista de jogos
+      } catch (err) {
+        console.error("Erro ao buscar jogos:", err);
+      }
+    };
+
+    fetchJogos();
+  }, []);
+
   /* ─── UI ─── */
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -293,6 +366,51 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
 
       <ScrollView contentContainerStyle={styles.container}>
+        <Menu
+          visible={menuOpen}
+          onDismiss={() => setMenuOpen(false)}
+          anchor={
+            <Button
+              mode="outlined" // 🔥 Mesmo modo dos outros
+              onPress={() => setMenuOpen(true)}
+              style={styles.saveButton}
+              //texto branco
+              labelStyle={styles.buttonLabel}
+            >
+              {jogoSel
+                ? `${jogoSel.nome_time_a} x ${jogoSel.nome_time_b} (${new Date(
+                    jogoSel.data_hora
+                  ).toLocaleDateString("pt-BR")})`
+                : "Escolher Jogo"}
+            </Button>
+          }
+        >
+          {jogos.length === 0 ? (
+            <Menu.Item title="Nenhum jogo encontrado" disabled />
+          ) : (
+            jogos.map((j) => (
+              <Menu.Item
+                key={j.id_jogo}
+                onPress={() => {
+                  setMenuOpen(false);
+                  setJogoSel(j);
+
+                  setValue("teamA", j.nome_time_a);
+                  setValue("teamB", j.nome_time_b);
+                  setValue(
+                    "date",
+                    new Date(j.data_hora).toLocaleDateString("pt-BR")
+                  );
+                  setValue("competition", j.nome_jogo ?? "");
+                }}
+                title={`${j.nome_time_a} x ${j.nome_time_b} (${new Date(
+                  j.data_hora
+                ).toLocaleDateString("pt-BR")})`}
+              />
+            ))
+          )}
+        </Menu>
+
         {/* ─── Dados gerais ─── */}
         <Text style={styles.sectionTitle}>Dados da Partida</Text>
 
@@ -351,6 +469,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
             <TextInput
               onChangeText={onChange}
               mode="outlined"
+              value={value}
               label="Data (dd/mm/aaaa)"
               style={styles.input}
               keyboardType="numeric"
@@ -385,6 +504,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
             <TextInput
               onChangeText={onChange}
               mode="outlined"
+              value={value}
               label="Equipe B"
               style={styles.input}
               error={!!errors.teamB}
@@ -458,9 +578,15 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
           mode="contained"
           style={styles.saveButton}
           labelStyle={styles.buttonLabel}
+          disabled={saving}
+          buttonColor={colors.primary} // Cor de fundo
           onPress={handleSubmit(onSubmit)}
         >
-          Salvar Súmula
+          {saving ? (
+            <ActivityIndicator animating={true} color="white" size="small" />
+          ) : (
+            "Salvar Súmula"
+          )}
         </Button>
 
         <HomeButton navigation={navigation} />
@@ -528,5 +654,5 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 40,
   },
-  buttonLabel: { fontSize: 16, fontWeight: "bold" },
+  buttonLabel: { fontSize: 16, fontWeight: "bold", color: "#FFF" },
 });

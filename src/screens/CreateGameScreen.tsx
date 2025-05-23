@@ -32,13 +32,17 @@ export default function CreateGameScreen({ navigation }) {
   const [games, setGames] = useState<any[]>([]);
   const fetchGames = async () => {
     try {
-      const res = await API.get("/jogos");
-      setGames(res.data); // lista inicial
+      const token = await AsyncStorage.getItem("token"); // Adicione esta linha
+      const res = await API.get("/jogos", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined, // Inclua o token
+        },
+      });
+      setGames(res.data);
     } catch (e) {
       console.warn("Erro ao buscar jogos", e);
     }
   };
-
   useEffect(() => {
     fetchGames();
   }, []);
