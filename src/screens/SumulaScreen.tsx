@@ -29,6 +29,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Header from "../components/Header";
 import HomeButton from "../components/HomeButton";
 import { colors } from "../theme/colors";
+import { buildSumulaHtml } from "../utils/pdfTemplate";
 
 /* ─── Tipagens ─── */
 interface SumulaScreenProps {
@@ -88,17 +89,8 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
   const [sumulaSel, setSumulaSel] = useState<FormDataWithId | null>(null);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [showSumulas, setShowSumulas] = useState(false);
+  const [showJogos, setShowJogos] = useState(false);
 
-  // const formatDateTime = (dateInput?: Date | string) => {
-  //   if (!dateInput) return "Selecione data e hora";
-  //   const d = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
-  //   console.log("d =>", d);
-  //   if (!(d instanceof Date) || isNaN(d.getTime())) return "Data inválida";
-  //   return `${d.toLocaleDateString("pt-BR")} ${d.toLocaleTimeString("pt-BR", {
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //   })}`;
-  // };
   const formatDateTime = (dateInput?: string | Date) => {
     if (!dateInput) return "Selecione data e hora";
 
@@ -252,14 +244,14 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
         jogadoresA: form.playersA.map((p) => ({
           nome: p.name,
           numero: p.number,
-          amarelo: p.yellow ?? false,
+          amarelo: Number(p.yellow) || 0,
           vermelho: p.red ?? false,
         })),
 
         jogadoresB: form.playersB.map((p) => ({
           nome: p.name,
           numero: p.number,
-          amarelo: p.yellow ?? false,
+          amarelo: Number(p.yellow) || 0,
           vermelho: p.red ?? false,
         })),
       };
@@ -419,15 +411,25 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
           <Controller
             control={control}
             name={`players${side}.${idx}.yellow`}
-            defaultValue={false}
-            render={({ field: { value, onChange } }) => (
-              <IconButton
-                icon={value ? "card" : "card-outline"}
-                onPress={() => onChange(!value)}
-                containerColor={value ? "#FFC107" : undefined}
-              />
+            defaultValue={0}
+            render={({ field }) => (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <IconButton
+                  icon="card"
+                  onPress={() => {
+                    const current = field.value || 0;
+                    const next = current >= 3 ? 0 : current + 1;
+                    field.onChange(next);
+                  }}
+                  containerColor={field.value > 0 ? "#FFC107" : undefined}
+                />
+                <Text style={{ fontSize: 14, marginLeft: 4 }}>
+                  {field.value || 0}x
+                </Text>
+              </View>
             )}
           />
+
           <Controller
             control={control}
             name={`players${side}.${idx}.red`}
@@ -485,15 +487,19 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
   }, []);
 
   const exportarPdf = async (dados: FormDataWithId) => {
-    const html = `
-     <html>
-       <body>
-         <h1>Súmula ${dados.teamA} x ${dados.teamB}</h1>
-         <pre>${JSON.stringify(dados, null, 2)}</pre>
-       </body>
-     </html>`;
-    const { uri } = await Print.printToFileAsync({ html });
-    await Sharing.shareAsync(uri);
+    try {
+      // chama o seu template para gerar o HTML completo
+      const html = buildSumulaHtml(dados);
+
+      // imprime para arquivo
+      const { uri } = await Print.printToFileAsync({ html });
+
+      // compartilha
+      await Sharing.shareAsync(uri);
+    } catch (err) {
+      console.error("Erro ao gerar PDF:", err);
+      alert("Falha ao gerar PDF");
+    }
   };
 
   /* ─── UI ─── */
@@ -508,85 +514,241 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
         onRequestClose={() => setModalVisivel(false)}
       >
         <View style={styles.modalWrap}>
-          <ScrollView style={styles.modalCard}>
-            {/* reaproveite o mesmo JSX que compõe a súmula, ou um resumo */}
-            <Text style={styles.modalTitle}>Visualização da Súmula</Text>
-            <Text>{JSON.stringify(sumulaSel, null, 2)}</Text>
+          <View style={styles.modalCard}>
+            <ScrollView contentContainerStyle={styles.modalContent}>
+              {/* Título */}
+              <Text style={styles.modalTitle}>
+                Súmula: {sumulaSel?.teamA} x {sumulaSel?.teamB}
+              </Text>
 
-            <Button
-              mode="outlined"
-              style={styles.modalButton}
-              onPress={() => exportarPdf(sumulaSel!)}
-            >
-              Gerar PDF
-            </Button>
-            <Button
-              mode="outlined"
-              style={styles.modalButton}
-              onPress={() => setModalVisivel(false)}
-            >
-              Fechar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.modalButton}
-              onPress={() => {
-                setModalVisivel(false);
-              }}
-            >
-              Editar Súmula
-            </Button>
-          </ScrollView>
+              {/* Dados gerais */}
+              <View style={styles.modalSection}>
+                <Text>
+                  <Text style={styles.bold}>Competição:</Text>{" "}
+                  {sumulaSel?.competition || "-"}
+                </Text>
+                <Text>
+                  <Text style={styles.bold}>Categoria:</Text>{" "}
+                  {sumulaSel?.category || "-"}
+                </Text>
+                <Text>
+                  <Text style={styles.bold}>Data:</Text>{" "}
+                  {sumulaSel?.date ? formatDateTime(sumulaSel.date) : "-"}
+                </Text>
+                <Text>
+                  <Text style={styles.bold}>Local:</Text>{" "}
+                  {sumulaSel?.venue || "-"}
+                </Text>
+                <Text>
+                  <Text style={styles.bold}>Árbitro:</Text>{" "}
+                  {sumulaSel?.referee || "-"}
+                </Text>
+                <Text>
+                  <Text style={styles.bold}>Resultado Final:</Text>{" "}
+                  {sumulaSel?.periods.reduce(
+                    (acc, p) => acc + Number(p.goalsA),
+                    0
+                  )}{" "}
+                  x{" "}
+                  {sumulaSel?.periods.reduce(
+                    (acc, p) => acc + Number(p.goalsB),
+                    0
+                  )}
+                </Text>
+              </View>
+
+              {/* Períodos */}
+              <View style={styles.modalSection}>
+                <Text style={styles.sectionSubTitle}>Divisão por Tempo</Text>
+                <View style={styles.periodHeader}>
+                  <Text style={[styles.periodLabel, { flex: 2 }]}>Período</Text>
+                  <Text style={styles.periodCol}>GA</Text>
+                  <Text style={styles.periodCol}>GB</Text>
+                  <Text style={styles.periodCol}>FA</Text>
+                  <Text style={styles.periodCol}>FB</Text>
+                  <Text style={styles.periodCol}>T.O A</Text>
+                  <Text style={styles.periodCol}>T.O B</Text>
+                </View>
+                {sumulaSel?.periods.map((p) => (
+                  <View key={p.period} style={styles.periodRow}>
+                    <Text style={[styles.periodLabel, { flex: 2 }]}>
+                      {p.period}
+                    </Text>
+                    <Text style={styles.periodCol}>{p.goalsA}</Text>
+                    <Text style={styles.periodCol}>{p.goalsB}</Text>
+                    <Text style={styles.periodCol}>{p.foulsA}</Text>
+                    <Text style={styles.periodCol}>{p.foulsB}</Text>
+                    <Text style={styles.periodCol}>{p.timeoutsA}</Text>
+                    <Text style={styles.periodCol}>{p.timeoutsB}</Text>
+                  </View>
+                ))}
+                {sumulaSel && (
+                  <View style={styles.periodRow}>
+                    <Text
+                      style={[
+                        styles.periodLabel,
+                        { flex: 2, fontWeight: "700" },
+                      ]}
+                    >
+                      Total
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.goalsA),
+                        0
+                      )}
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.goalsB),
+                        0
+                      )}
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.foulsA),
+                        0
+                      )}
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.foulsB),
+                        0
+                      )}
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.timeoutsA),
+                        0
+                      )}
+                    </Text>
+                    <Text style={styles.periodCol}>
+                      {sumulaSel.periods.reduce(
+                        (sum, p) => sum + Number(p.timeoutsB),
+                        0
+                      )}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Atletas A */}
+              <View style={styles.modalSection}>
+                <Text style={styles.sectionSubTitle}>Atletas – Equipe A</Text>
+                {sumulaSel?.playersA.map((p, i) => (
+                  <Text key={i} style={styles.playerLine}>
+                    {p.number} – {p.name}{" "}
+                    {p.yellow > 0 && (
+                      <Text style={styles.yellowCard}>🟨 {p.yellow}x</Text>
+                    )}
+                    {p.red && <Text style={styles.redCard}>🟥</Text>}
+                  </Text>
+                ))}
+              </View>
+
+              {/* Atletas B */}
+              <View style={styles.modalSection}>
+                <Text style={styles.sectionSubTitle}>Atletas – Equipe B</Text>
+                {sumulaSel?.playersB.map((p, i) => (
+                  <Text key={i} style={styles.playerLine}>
+                    {p.number} – {p.name}{" "}
+                    {p.yellow > 0 && (
+                      <Text style={styles.yellowCard}>🟨 {p.yellow}x</Text>
+                    )}
+                    {p.red && <Text style={styles.redCard}>🟥</Text>}
+                  </Text>
+                ))}
+              </View>
+
+              {/* Observações */}
+              <View style={styles.modalSection}>
+                <Text style={styles.sectionSubTitle}>Observações</Text>
+                <Text>{sumulaSel?.notes || "-"}</Text>
+              </View>
+
+              {/* Botões */}
+              <View style={styles.modalButtons}>
+                <Button
+                  mode="contained"
+                  buttonColor={colors.primary}
+                  textColor="#FFF"
+                  style={styles.modalButton}
+                  onPress={() => exportarPdf(sumulaSel!)}
+                >
+                  PDF
+                </Button>
+                <Button
+                  mode="outlined"
+                  textColor={colors.primary}
+                  style={styles.modalButton}
+                  onPress={() => setModalVisivel(false)}
+                >
+                  Fechar
+                </Button>
+                <Button
+                  mode="contained"
+                  buttonColor={colors.primary}
+                  textColor="#FFF"
+                  style={styles.modalButton}
+                  onPress={() => {
+                    setModalVisivel(false);
+                    /* fluxo de editar já está tratado */
+                  }}
+                >
+                  Editar
+                </Button>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </Modal>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <Menu
-          visible={menuOpen}
-          onDismiss={() => setMenuOpen(false)}
-          anchor={
-            <Button
-              mode="outlined" // 🔥 Mesmo modo dos outros
-              onPress={() => setMenuOpen(true)}
-              style={styles.saveButton}
-              //texto branco
-              labelStyle={styles.buttonLabel}
-            >
-              {jogoSel
-                ? `${jogoSel.nome_time_a} x ${jogoSel.nome_time_b} (${
-                    jogoSel.data_hora
-                      ? new Date(jogoSel.data_hora).toLocaleDateString("pt-BR")
-                      : "Sem Data"
-                  })`
-                : "Escolher Jogo"}
-            </Button>
-          }
+        <Button
+          mode="outlined"
+          style={styles.saveButton}
+          labelStyle={styles.buttonLabel}
+          onPress={() => setShowJogos(!showJogos)}
         >
-          {jogos.length === 0 ? (
-            <Menu.Item title="Nenhum jogo encontrado" disabled />
-          ) : (
-            jogos.map((j) => (
-              <Menu.Item
-                key={j.id_jogo}
+          {showJogos ? "Ocultar Jogos" : "Visualizar Jogos"}
+        </Button>
+        {showJogos && (
+          <FlatList
+            horizontal
+            data={jogos}
+            keyExtractor={(item) => item.id_jogo.toString()}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.sumulaCard}
                 onPress={() => {
-                  setMenuOpen(false);
-                  setJogoSel(j);
-
-                  setValue("teamA", j.nome_time_a);
-                  setValue("teamB", j.nome_time_b);
-                  setValue(
-                    "date",
-                    new Date(j.data_hora).toLocaleDateString("pt-BR")
-                  );
-                  setValue("competition", j.nome_jogo ?? "");
+                  setShowJogos(false);
+                  setJogoSel(item);
+                  setSumulaSel(null);
+                  setValue("teamA", item.nome_time_a);
+                  setValue("teamB", item.nome_time_b);
+                  setValue("date", new Date(item.data_hora));
+                  setValue("competition", item.nome_jogo ?? "");
                 }}
-                title={`${j.nome_time_a} x ${j.nome_time_b} (${new Date(
-                  j.data_hora
-                ).toLocaleDateString("pt-BR")})`}
-              />
-            ))
-          )}
-        </Menu>
+              >
+                <Text style={styles.sumulaCardTitle}>
+                  {item.nome_time_a} x {item.nome_time_b}
+                </Text>
+                {item.nome_jogo && (
+                  <Text style={styles.sumulaCardSubtitle}>
+                    {item.nome_jogo}
+                  </Text>
+                )}
+                <Text style={styles.sumulaCardDate}>
+                  {item.data_hora
+                    ? new Date(item.data_hora).toLocaleDateString("pt-BR")
+                    : "Sem Data"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
         <Button
           mode="outlined"
           style={styles.saveButton}
@@ -602,7 +764,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
             keyExtractor={(item) => item.id_sumula.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.sumulaTag}
+                style={styles.sumulaCard}
                 onPress={() => {
                   const toForm = {
                     id: item.id_sumula,
@@ -611,7 +773,6 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
                     category: item.categoria ?? "",
                     venue: item.local ?? "",
                     date: item.data_hora ? new Date(item.data_hora) : null,
-
                     city: item.cidade ?? "",
                     teamA: item.equipe_a ?? "",
                     teamB: item.equipe_b ?? "",
@@ -659,18 +820,21 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
                       red: j.vermelho,
                     })),
                   };
-                  console.log(
-                    "sumulaSel que vai pro modal e pro reset =>",
-                    toForm
-                  );
-
                   setSumulaSel(toForm);
                   setModalVisivel(true);
                   reset(toForm);
                 }}
               >
-                <Text style={styles.sumulaTagText}>
-                  {item.teamA} x {item.teamB}
+                <Text style={styles.sumulaCardTitle}>
+                  {item.equipe_a} x {item.equipe_b}
+                </Text>
+                <Text style={styles.sumulaCardSubtitle}>
+                  {item.competicao} • {item.categoria}
+                </Text>
+                <Text style={styles.sumulaCardDate}>
+                  {item.data_hora
+                    ? new Date(item.data_hora).toLocaleDateString("pt-BR")
+                    : "Sem Data"}
                 </Text>
               </TouchableOpacity>
             )}
@@ -816,7 +980,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
         {/* ─── Períodos ─── */}
         <Text style={styles.sectionTitle}>Divisão por Tempo</Text>
         <View style={styles.periodHeader}>
-          <Text style={[styles.periodLabel, { flex: 1.4 }]}></Text>
+          <Text style={[styles.periodLabel, { flex: 1.2 }]}></Text>
           <Text style={styles.periodCol}>GA</Text>
           <Text style={styles.periodCol}>GB</Text>
           <Text style={styles.periodCol}>FA</Text>
@@ -825,6 +989,50 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
           <Text style={styles.periodCol}>T.O B</Text>
         </View>
         {periodFields.map((p, idx) => renderPeriodRow(idx, p as PeriodData))}
+        {sumulaSel && (
+          <View style={styles.periodHeader}>
+            <View style={styles.periodRow}>
+              <Text style={styles.periodLabel}>Total</Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.goalsA),
+                  0
+                )}
+              </Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.goalsB),
+                  0
+                )}
+              </Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.foulsA),
+                  0
+                )}
+              </Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.foulsB),
+                  0
+                )}
+              </Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.timeoutsA),
+                  0
+                )}
+              </Text>
+              <Text style={styles.periodCol}>
+                {sumulaSel.periods.reduce(
+                  (sum, p) => sum + Number(p.timeoutsB),
+                  0
+                )}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* ─── Árbitro ─── */}
         <Controller
           control={control}
@@ -945,7 +1153,7 @@ const styles = StyleSheet.create({
   periodRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   periodLabel: { flex: 1.4, fontWeight: "600", color: colors.primary },
   periodCol: {
@@ -968,6 +1176,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     backgroundColor: colors.primary,
     height: 50,
+    width: "80%",
     borderRadius: 10,
     justifyContent: "center",
     alignSelf: "center",
@@ -983,26 +1192,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sumulaTagText: { fontWeight: "600" },
-  modalWrap: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalCard: {
-    width: "90%",
-    maxHeight: "80%",
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
-  },
-  modalTitle: { fontSize: 20, fontWeight: "700", marginBottom: 12 },
   viewSumulasButton: {
     marginVertical: 12,
     alignSelf: "center",
-  },
-  modalButton: {
-    marginVertical: 6,
   },
   dateButton: {
     padding: 12,
@@ -1016,5 +1208,87 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 16,
     fontWeight: "600",
+  },
+  sumulaCard: {
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    marginLeft: 12,
+    marginTop: 12,
+    marginRight: 12,
+    minWidth: 180,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  sumulaCardTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+
+  sumulaCardSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
+  },
+
+  sumulaCardDate: {
+    fontSize: 12,
+    color: "#999",
+    marginTop: 8,
+  },
+  modalWrap: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  modalCard: {
+    width: "100%",
+    maxHeight: "80%",
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  modalContent: {
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: colors.primary,
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  modalSection: {
+    marginBottom: 16,
+  },
+  bold: {
+    fontWeight: "700",
+  },
+  playerLine: {
+    fontSize: 14,
+    marginVertical: 2,
+  },
+  yellowCard: {
+    color: "#FFC107",
+  },
+  redCard: {
+    color: "#F44336",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 24,
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 4,
   },
 });
