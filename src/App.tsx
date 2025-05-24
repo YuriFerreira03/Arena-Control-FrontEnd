@@ -1,4 +1,4 @@
-// rodar android : npx expo start --dev-client --host=lan
+// rodar android : npx expo start --dev-client
 
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, StatusBar, Platform } from "react-native";
@@ -17,7 +17,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as PaperProvider } from "react-native-paper";
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState("Home");
+  const [currentScreen, setCurrentScreen] = useState("Login");
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false); // <-- estado de fontes carregadas
 
