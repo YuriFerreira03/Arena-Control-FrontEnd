@@ -17,7 +17,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as PaperProvider } from "react-native-paper";
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState("PlacarEletronico");
+  const [currentScreen, setCurrentScreen] = useState("Login");
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false); // <-- estado de fontes carregadas
   const [sumulaKey, setSumulaKey] = useState(0);
