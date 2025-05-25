@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,70 +6,61 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 
 import Header from "../components/Header";
 import HomeButton from "../components/HomeButton";
 import { colors } from "../theme/colors";
+import api from "../service/api";
 
 /* ─── Tipagens ─── */
 interface TableScreenProps {
   navigation: { navigate: (screen: string, params?: any) => void };
 }
 
-interface Game {
-  id: string;
-  name: string;
-  teamA: string;
-  teamB: string;
-  date: Date;
-}
-
 interface ClassificationTable {
-  id: string;
-  name: string;
-  victories: number;
-  draws: number;
-  defeats: number;
-  goalDifference: number;
-  points: number;
+  id_tabela: number;
+  nome_tabela: string;
 }
 
-/* ───────────────────────────────────────────── */
 export default function TableScreen({ navigation }: TableScreenProps) {
-  /* ─── Estados ─── */
-  const [games, setGames] = useState<Game[]>([]); // Mantém se quiser listar jogos
   const [tables, setTables] = useState<ClassificationTable[]>([]);
   const [tableName, setTableName] = useState("");
 
-  /* ─── Helpers ─── */
-  const formatDateTime = (date: Date) => {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
+  const userId = 3; // 🔥 Trocar pelo usuário logado
+
+  /* ─── Buscar tabelas do banco ─── */
+  const fetchTables = async () => {
+    try {
+      const response = await api.get(`/tabelas/user/${userId}`);
+      setTables(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar tabelas:", error);
+    }
   };
 
-  /* ─── Criar tabela ─── */
-  const handleSaveTable = () => {
+  useEffect(() => {
+    fetchTables();
+  }, []);
+
+  /* ─── Criar tabela no banco ─── */
+  const handleSaveTable = async () => {
     if (!tableName.trim()) return;
-    setTables((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        name: tableName.trim(),
-        victories: 0,
-        draws: 0,
-        defeats: 0,
-        goalDifference: 0,
-        points: 0,
-      },
-    ]);
-    setTableName("");
+
+    try {
+      await api.post("/tabelas", {
+        nome_tabela: tableName.trim(),
+        fk_usuario_id_usr: userId,
+      });
+      setTableName("");
+      fetchTables(); // 🔥 Atualiza a lista
+      Alert.alert("Sucesso", "Tabela criada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar tabela:", error);
+      Alert.alert("Erro", "Não foi possível criar a tabela.");
+    }
   };
 
   return (
@@ -80,29 +71,6 @@ export default function TableScreen({ navigation }: TableScreenProps) {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ─── Botão para criar jogo ───
-        <Button
-          mode="contained"
-          style={styles.saveButton}
-          onPress={() => navigation.navigate("CreateGame")}
-        >
-          Criar Novo Jogo
-        </Button> */}
-
-        {/* ─── Lista de Jogos (opcional) ─── */}
-        {games.length > 0 && (
-          <View style={styles.listSection}>
-            <Text style={styles.sectionTitle}>Jogos Criados</Text>
-            {games.map((g) => (
-              <View key={g.id} style={styles.listItem}>
-                <Text style={styles.listText}>{g.name}</Text>
-                <Text style={styles.listSubText}>
-                  {g.teamA} x {g.teamB} – {formatDateTime(g.date)}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
         {/* ─── Criar Tabela ─── */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Criar Tabela</Text>
@@ -126,31 +94,19 @@ export default function TableScreen({ navigation }: TableScreenProps) {
             Salvar Tabela
           </Button>
         </View>
+
         {/* ─── Listar Tabelas ─── */}
         {tables.length > 0 && (
           <View style={styles.listSection}>
             <Text style={styles.sectionTitle}>Tabelas de Classificação</Text>
             {tables.map((t) => (
-              <View key={t.id} style={styles.tableCard}>
-                <Text style={styles.tableName}>{t.name}</Text>
-                <View style={styles.tableRow}>
-                  <Text style={styles.tableHeader}>VIT</Text>
-                  <Text style={styles.tableHeader}>EMP</Text>
-                  <Text style={styles.tableHeader}>DER</Text>
-                  <Text style={styles.tableHeader}>SG</Text>
-                  <Text style={styles.tableHeader}>PTS</Text>
-                </View>
-                <View style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{t.victories}</Text>
-                  <Text style={styles.tableCell}>{t.draws}</Text>
-                  <Text style={styles.tableCell}>{t.defeats}</Text>
-                  <Text style={styles.tableCell}>{t.goalDifference}</Text>
-                  <Text style={styles.tableCell}>{t.points}</Text>
-                </View>
+              <View key={t.id_tabela} style={styles.tableCard}>
+                <Text style={styles.tableName}>{t.nome_tabela}</Text>
               </View>
             ))}
           </View>
         )}
+
         {/* ─── Botão Home ─── */}
         <HomeButton navigation={navigation} />
       </ScrollView>
@@ -186,9 +142,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   listSection: { marginBottom: 32 },
-  listItem: { padding: 12, borderBottomWidth: 1, borderColor: "#DDD" },
-  listText: { fontSize: 16, fontWeight: "600", color: colors.primary },
-  listSubText: { fontSize: 14, color: "#666" },
   tableCard: {
     backgroundColor: "#F5F7FA",
     borderRadius: 12,
@@ -200,23 +153,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.primary,
     marginBottom: 8,
-  },
-  tableRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  tableHeader: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 14,
-    color: colors.primary,
   },
 });

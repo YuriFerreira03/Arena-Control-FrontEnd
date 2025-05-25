@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
+  Alert,
   Platform,
 } from "react-native";
 import {
@@ -30,6 +31,8 @@ import Header from "../components/Header";
 import HomeButton from "../components/HomeButton";
 import { colors } from "../theme/colors";
 import { buildSumulaHtml } from "../utils/pdfTemplate";
+import { DevSettings } from "react-native";
+import VisualizarJogos from "../components/ViewGames";
 
 /* ─── Tipagens ─── */
 interface SumulaScreenProps {
@@ -75,7 +78,7 @@ interface JogoDto {
   equipe_a: string;
   equipe_b: string;
   data_hora: string;
-  nome?: string;
+  nome_jogo?: string;
 }
 
 /* ───────────────────────────────────────────── */
@@ -275,6 +278,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
       alert("Erro ao salvar súmula");
     } finally {
       setSaving(false);
+      navigation.navigate("Sumula");
     }
   };
 
@@ -462,7 +466,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
   useEffect(() => {
     const fetchJogos = async () => {
       try {
-        const res = await API.get("/jogos");
+        const res = await API.get("/jogos/jogados/lista");
         setJogos(res.data);
       } catch (err) {
         console.error("Erro ao buscar jogos:", err);
@@ -501,6 +505,37 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
       alert("Falha ao gerar PDF");
     }
   };
+
+  async function fetchPlacarEPreencher(jogoId: number) {
+    try {
+      const res = await API.get<PlacarDto[]>(`/placar/jogo/${jogoId}`);
+      /* pegue só o mais recente de cada período */
+      const mapa = new Map<number, PlacarDto>();
+      res.data
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        .forEach((p) => {
+          if (!mapa.has(p.periodo)) mapa.set(p.periodo, p);
+        });
+
+      Array.from(mapa.values()).forEach((p) => {
+        const idx = (p.periodo ?? 1) - 1; // 1→0, 2→1, 3→2
+        /* pontos = gols  */
+        setValue(`periods.${idx}.goalsA`, String(p.pontos_time_a ?? ""));
+        setValue(`periods.${idx}.goalsB`, String(p.pontos_time_b ?? ""));
+        /* faltas */
+        setValue(`periods.${idx}.foulsA`, String(p.set_faltas_a ?? ""));
+        setValue(`periods.${idx}.foulsB`, String(p.set_faltas_b ?? ""));
+        /* tempos */
+        setValue(`periods.${idx}.timeoutsA`, String(p.pedido_tempo_a ?? ""));
+        setValue(`periods.${idx}.timeoutsB`, String(p.pedido_tempo_b ?? ""));
+      });
+    } catch {
+      Alert.alert("Erro", "Não foi possível carregar o placar.");
+    }
+  }
 
   /* ─── UI ─── */
   return (
@@ -704,50 +739,22 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
       </Modal>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <Button
-          mode="outlined"
-          style={styles.saveButton}
-          labelStyle={styles.buttonLabel}
-          onPress={() => setShowJogos(!showJogos)}
-        >
-          {showJogos ? "Ocultar Jogos" : "Visualizar Jogos"}
-        </Button>
-        {showJogos && (
-          <FlatList
-            horizontal
-            data={jogos}
-            keyExtractor={(item) => item.id_jogo.toString()}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.sumulaCard}
-                onPress={() => {
-                  setShowJogos(false);
-                  setJogoSel(item);
-                  setSumulaSel(null);
-                  setValue("teamA", item.nome_time_a);
-                  setValue("teamB", item.nome_time_b);
-                  setValue("date", new Date(item.data_hora));
-                  setValue("competition", item.nome_jogo ?? "");
-                }}
-              >
-                <Text style={styles.sumulaCardTitle}>
-                  {item.nome_time_a} x {item.nome_time_b}
-                </Text>
-                {item.nome_jogo && (
-                  <Text style={styles.sumulaCardSubtitle}>
-                    {item.nome_jogo}
-                  </Text>
-                )}
-                <Text style={styles.sumulaCardDate}>
-                  {item.data_hora
-                    ? new Date(item.data_hora).toLocaleDateString("pt-BR")
-                    : "Sem Data"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
+        <VisualizarJogos
+          jogos={jogos}
+          show={showJogos}
+          onToggle={() => setShowJogos((prev) => !prev)}
+          onSelect={async (item) => {
+            setShowJogos(false);
+            setJogoSel(item);
+
+            setValue("teamA", item.nome_time_a);
+            setValue("teamB", item.nome_time_b);
+            setValue("date", new Date(item.data_hora));
+            setValue("competition", item.nome_jogo ?? "");
+
+            await fetchPlacarEPreencher(item.id_jogo);
+          }}
+        />
 
         <Button
           mode="outlined"
@@ -1110,6 +1117,8 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
                 setSumulas(data);
               } catch (e) {
                 // alert("Erro ao excluir");
+              } finally {
+                navigation.navigate("Sumula");
               }
             }}
           >

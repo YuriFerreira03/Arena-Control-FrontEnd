@@ -12,7 +12,6 @@ const API = axios.create({
   },
 });
 
-// 🔥 Interceptor para adicionar token automaticamente em todas as requisições
 API.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem('token');

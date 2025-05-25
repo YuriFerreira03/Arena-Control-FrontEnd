@@ -17,10 +17,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as PaperProvider } from "react-native-paper";
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState("Login");
+  const [currentScreen, setCurrentScreen] = useState("PlacarEletronico");
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false); // <-- estado de fontes carregadas
-
+  const [sumulaKey, setSumulaKey] = useState(0);
   useEffect(() => {
     Font.loadAsync({
       ...Ionicons.font,
@@ -29,6 +29,10 @@ const App = () => {
 
   const navigateTo = (screen, data) => {
     if (data?.user) setUser(data.user);
+    // quando for pra Sumula, incrementa o key
+    if (screen === "Sumula") {
+      setSumulaKey((k) => k + 1);
+    }
     setCurrentScreen(screen);
   };
 
@@ -72,7 +76,7 @@ const App = () => {
                 <CreateGameScreen navigation={navigation} />
               )}
               {currentScreen === "Sumula" && (
-                <SumulaScreen navigation={navigation} />
+                <SumulaScreen key={sumulaKey} navigation={navigation} />
               )}
             </View>
             <View style={styles.bottomSection} />
