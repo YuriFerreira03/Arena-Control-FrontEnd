@@ -1,40 +1,43 @@
 {
   "expo": {
-    "name": "BLEExpoBlog",
-    "slug": "BLEExpoBlog",
+    "name": "ArenaControl",
+    "slug": "arenacontrol",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/ArenaControl.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/ArenaControl.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "extra": {
       "apiUrl": "http://192.168.1.76:3000",
       "eas": {
-        "projectId": "72cfb7f0-e1d3-46c8-93f9-1071aa71a109"
+        "projectId": "4578e0f4-c6c7-48c2-8f06-b6d2ab11de7e"
       }
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.wa2goose.BLEExpoBlog"
+      "bundleIdentifier": "com.yuriferreira.arenacontrol"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
+      "package": "com.yuriferreira.arenacontrol",
       "permissions": [
         "BLUETOOTH",
         "BLUETOOTH_ADMIN",
         "BLUETOOTH_CONNECT",
         "BLUETOOTH_SCAN",
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT"
       ],
-      "package": "com.wa2goose.BLEExpoBlog"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/ArenaControl.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

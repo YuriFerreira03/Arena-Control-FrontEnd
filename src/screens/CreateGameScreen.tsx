@@ -476,15 +476,15 @@ export default function CreateGameScreen({ navigation }) {
         >
           <Text style={styles.toggleButtonText}>
             {showJogadosList
-              ? "Ocultar Jogos Concluidos"
-              : "Mostrar Jogos Concluidos"}
+              ? "Ocultar Jogos Concluídos"
+              : "Mostrar Jogos Concluídos"}
           </Text>
         </TouchableOpacity>
 
         {showJogadosList && (
           <>
             <Text style={[styles.sectionTitle, { marginTop: 24 }]}>
-              Jogos Jogados
+              Jogos Concluídos
             </Text>
 
             {jogados.length === 0 ? (

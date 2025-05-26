@@ -19,6 +19,10 @@ import { colors } from "../theme/colors";
 import api from "../service/api";
 import { useForm, Controller } from "react-hook-form";
 import API from "../service/api";
+import { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import * as MediaLibrary from "expo-media-library";
+import { useRef } from "react";
 
 /* ─── Tipagens ─── */
 interface TableScreenProps {
@@ -52,6 +56,7 @@ export default function TableScreen({ navigation }: TableScreenProps) {
   const [selectedJogado, setSelectedJogado] = useState<JogoDto | null>(null);
   const [modalTabelaVisible, setModalTabelaVisible] = useState(false);
   const [jogoSelecionado, setJogoSelecionado] = useState<JogoDto | null>(null);
+  const tableRef = useRef<View>(null);
 
   const {
     control,
@@ -76,6 +81,33 @@ export default function TableScreen({ navigation }: TableScreenProps) {
     });
     setEditingId(item.id_jogo);
   };
+
+  async function exportToPng() {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permissão negada", "Não foi possível salvar imagem.");
+        return;
+      }
+
+      // captura a view como PNG
+      const uri = await captureRef(tableRef, {
+        format: "png",
+        quality: 1,
+      });
+
+      // opcional: salvar direto no rolo
+      // await MediaLibrary.createAssetAsync(uri);
+
+      // ou abrir share sheet
+      await Sharing.shareAsync(uri);
+    } catch (err) {
+      console.error("Erro ao exportar PNG:", err);
+      Alert.alert("Erro", "Falha ao gerar PNG.");
+    }
+  }
 
   const fetchTables = async () => {
     try {
@@ -415,7 +447,10 @@ export default function TableScreen({ navigation }: TableScreenProps) {
         </TouchableOpacity>
 
         {selectedTableId && (
-          <View style={styles.listSection}>
+          <View
+            ref={tableRef}
+            style={{ backgroundColor: "white", padding: 10, minHeight: 200 }}
+          >
             <Text style={styles.sectionTitle}>
               {tables.find((t) => t.id_tabela === selectedTableId)?.nome_tabela}
             </Text>
@@ -427,10 +462,10 @@ export default function TableScreen({ navigation }: TableScreenProps) {
               >
                 Time
               </Text>
+              <Text style={[styles.cell, styles.tableHeaderText]}>PTS</Text>
               <Text style={[styles.cell, styles.tableHeaderText]}>VIT</Text>
               <Text style={[styles.cell, styles.tableHeaderText]}>EMP</Text>
               <Text style={[styles.cell, styles.tableHeaderText]}>DER</Text>
-              <Text style={[styles.cell, styles.tableHeaderText]}>PTS</Text>
               <Text style={[styles.cell, styles.tableHeaderText]}>SG</Text>
             </View>
 
@@ -445,10 +480,10 @@ export default function TableScreen({ navigation }: TableScreenProps) {
                   <Text style={[styles.cell, styles.cellTeam]}>
                     {item.team}
                   </Text>
+                  <Text style={styles.cell}>{item.pontos}</Text>
                   <Text style={styles.cell}>{item.vitorias}</Text>
                   <Text style={styles.cell}>{item.empates}</Text>
                   <Text style={styles.cell}>{item.derrotas}</Text>
-                  <Text style={styles.cell}>{item.pontos}</Text>
                   <Text style={styles.cell}>{item.saldo_gols}</Text>
                 </View>
               ))
@@ -462,6 +497,14 @@ export default function TableScreen({ navigation }: TableScreenProps) {
               }}
             >
               <Text style={styles.toggleButtonText}>Fechar Classificação</Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity onPress={exportToPng}>
+              <Text style={styles.toggleButton}>PNG</Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity style={styles.toggleButton} onPress={exportToPng}>
+              <Text style={styles.toggleButtonText}>PNG</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -542,6 +585,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
     borderRadius: 12,
     width: "100%",
+    height: 50,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  toggleButton3: {
+    backgroundColor: colors.primary,
+    paddingVertical: 3,
+    paddingHorizontal: 3,
+    borderRadius: 12,
+    width: "80%",
     height: 50,
     alignItems: "center",
     marginTop: 16,

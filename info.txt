@@ -9,3 +9,5 @@ eas build --platform android --profile development --local
 rodar expo no celular :
 
 npx expo start --dev-client
+npx expo run:android
+
