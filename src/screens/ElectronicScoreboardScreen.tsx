@@ -355,7 +355,9 @@ export default function PlacarEletronico({ navigation }) {
 
       <View style={styles.container}>
         <View style={styles.teamBlock}>
-          <Text style={styles.teamTitle}>EQUIPE A</Text>
+          <Text style={styles.sectionTitle}>
+            {jogoSel?.nome_time_a || "Equipe A"}
+          </Text>
 
           {/* +1 / -1 Pontos */}
           <View style={styles.pointsButtons}>
@@ -419,7 +421,9 @@ export default function PlacarEletronico({ navigation }) {
 
         {/* 2. (cont.) EQUIPE B – logo abaixo, ocupa 100 % */}
         <View style={[styles.teamBlock, { marginTop: 10 }]}>
-          <Text style={styles.teamTitle}>EQUIPE B</Text>
+          <Text style={styles.sectionTitle}>
+            {jogoSel?.nome_time_b || "Equipe B"}
+          </Text>
 
           <View style={styles.pointsButtons}>
             <TouchableOpacity

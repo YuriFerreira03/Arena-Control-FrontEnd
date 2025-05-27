@@ -148,8 +148,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 16,
     marginTop: 16,
+    width: 280,
+    alignSelf: "center",
   },
   nextButton: {
     backgroundColor: colors.primary,
