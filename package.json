@@ -21,6 +21,7 @@
     "expo-dev-client": "~4.0.29",
     "expo-device": "~6.0.2",
     "expo-font": "~12.0.10",
+    "expo-media-library": "~16.0.5",
     "expo-print": "~13.0.1",
     "expo-sharing": "~12.0.1",
     "expo-status-bar": "~1.12.1",
@@ -32,12 +33,12 @@
     "react-native-orientation-locker": "^1.7.0",
     "react-native-paper": "^5.13.1",
     "react-native-permissions": "^5.4.0",
+    "react-native-responsive-screen": "^1.4.2",
     "react-native-safe-area-context": "^5.4.1",
     "react-native-screens": "^4.9.2",
     "react-native-vector-icons": "^10.2.0",
-    "yup": "^1.6.1",
     "react-native-view-shot": "3.8.0",
-    "expo-media-library": "~16.0.5"
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

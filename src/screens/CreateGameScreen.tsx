@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    paddingBottom: 100,
+    paddingBottom: 150,
   },
   sectionTitle: {
     fontSize: 20,

@@ -12,6 +12,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Header from "../components/Header";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 interface HomeScreenProps {
   navigation: { navigate: (screen: string, params?: any) => void };
@@ -197,9 +201,9 @@ const styles = StyleSheet.create({
   welcomeBox: {
     backgroundColor: "#003366",
     width: "100%",
-    aspectRatio: 3, // largura 2× altura
-    marginTop: 30,
-    marginBottom: 40,
+    height: hp("10%"),
+    marginTop: hp("5%"),
+    marginBottom: hp("5%"),
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",

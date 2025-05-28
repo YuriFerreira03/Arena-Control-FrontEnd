@@ -1,13 +1,18 @@
 // styles/PlacarEletronicoStyles.ts
 import { StyleSheet } from "react-native";
 import { colors } from "../theme/colors"; // azul primário #003366
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default StyleSheet.create({
   /* ─── Estrutura base ─── */
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    padding: 20,
+    paddingHorizontal: wp("2%"),
+    paddingVertical: hp("2%"),
   },
 
   /* ─── Blocos das equipes ─── */
@@ -18,9 +23,9 @@ export default StyleSheet.create({
   teamBlock: {
     width: "100%",
     backgroundColor: "#F5F7FA",
-    borderRadius: 16,
-    padding: 12,
-    marginTop: -10,
+    borderRadius: wp("14%"),
+    padding: wp("2%"),
+    marginTop: hp("-1%"),
     alignItems: "center",
   },
   teamTitle: {
@@ -39,22 +44,22 @@ export default StyleSheet.create({
   pointsButtons: { flexDirection: "row", marginBottom: 8 },
   bigButton: {
     backgroundColor: colors.primary,
-    width: 100,
-    height: 80,
-    borderRadius: 40,
+    width: wp("24%"),
+    height: hp("10%"),
+    borderRadius: wp("12%"),
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 6,
+    marginHorizontal: wp("2%"),
   },
   bigBtnLabel: { color: "#FFF", fontSize: 22, fontWeight: "700" },
 
   /* Set/Faltas | Serviço | P. Tempo */
   miscRow: { flexDirection: "row", marginTop: 8 },
   smallCircle: {
-    width: 40, // antes 28
-    height: 40, // antes 28
-    borderRadius: 20, // antes 14
-    marginHorizontal: 4,
+    width: wp("10%"),
+    height: wp("10%"),
+    borderRadius: wp("5%"),
+    marginHorizontal: wp("1.5%"),
     backgroundColor: colors.primary,
   },
   miscLabel: { fontSize: 12, color: colors.primary, marginTop: 4 },
@@ -64,13 +69,13 @@ export default StyleSheet.create({
   timer: { fontSize: 48, fontWeight: "700", color: colors.primary },
   generalRow: { flexDirection: "row", marginTop: 12 },
   generalCircle: {
-    width: 100,
-    height: 80,
-    borderRadius: 25,
+    width: wp("25%"),
+    height: hp("10%"),
+    borderRadius: wp("6%"),
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 6,
+    marginHorizontal: wp("2%"),
   },
   generalLabel: { color: "#FFF", textAlign: "center", fontWeight: "600" },
 
@@ -221,20 +226,17 @@ export default StyleSheet.create({
     textAlign: "center",
   },
   menuItem1: {
-    paddingVertical: 12,
+    paddingVertical: hp("1.5%"),
     backgroundColor: "#FFF",
-    borderRadius: 12,
+    borderRadius: wp("3%"),
     alignItems: "center",
-    marginTop: 400,
-    width: "30%",
+    marginTop: hp("45%"),
+    width: wp("30%"),
     alignSelf: "center",
     justifyContent: "center",
-    marginBottom: -100,
+    marginBottom: hp("-10%"),
     borderWidth: 2,
     borderColor: colors.primary,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0,
-    shadowRadius: 4,
     elevation: 4,
   },
   viewGamesOverlay: {

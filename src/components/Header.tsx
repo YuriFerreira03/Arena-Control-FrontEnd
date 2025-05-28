@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import React from "react";
 import {
   View,
@@ -9,18 +8,20 @@ import {
 } from "react-native";
 
 export default function Header() {
-  const { width } = useWindowDimensions();
-  const logoSize = Math.min(90, width * 0.9);
+  const { width, height } = useWindowDimensions();
+  const logoSize = Math.min(80, width * 0.18); // 18% da largura até no máx 90
+  const paddingHorizontal = width * 0.05;
+  const paddingVertical = height * 0.015;
+  const fontSize = Math.min(30, width * 0.08);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingHorizontal, paddingVertical }]}>
       <Image
         source={require("../../assets/logoHD.png")}
         style={[styles.logo, { width: logoSize, height: logoSize }]}
       />
 
-      {/* Texto com duas cores e sombra */}
-      <Text style={styles.brand}>
+      <Text style={[styles.brand, { fontSize }]}>
         <Text style={styles.brandLeft}>Arena</Text>
         <Text style={styles.brandRight}>Control</Text>
       </Text>
@@ -32,18 +33,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     backgroundColor: "#003366",
   },
   logo: {
     resizeMode: "contain",
   },
-
-  // novo estilo aninhado
   brand: {
-    fontSize: 30, // grande e chamativo
-    letterSpacing: 1, // lembra dígitos de placar
+    letterSpacing: 1,
     fontFamily: "monospace",
     marginBottom: 16,
     marginTop: 18,
@@ -51,13 +47,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   brandLeft: {
-    color: "#FFFFFF", // “Arena” em branco
+    color: "#FFFFFF",
     textShadowColor: "#002B55",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
   brandRight: {
-    color: "#C8FF57", // “Control” em verde-limão
+    color: "#C8FF57",
     textShadowColor: "#044B97",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
