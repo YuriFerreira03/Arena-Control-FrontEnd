@@ -23,6 +23,8 @@ import { captureRef } from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import * as MediaLibrary from "expo-media-library";
 import { useRef } from "react";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { IconButton } from "react-native-paper";
 
 /* ─── Tipagens ─── */
 interface TableScreenProps {
@@ -80,6 +82,49 @@ export default function TableScreen({ navigation }: TableScreenProps) {
       gameDate: new Date(item.data_hora),
     });
     setEditingId(item.id_jogo);
+  };
+
+  const handleUpdateTable = async (id: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await api.put(
+        `/tabelas/${id}`,
+        { nome_tabela: tableName.trim() },
+        {
+          headers: { Authorization: token ? `Bearer ${token}` : undefined },
+        }
+      );
+      Alert.alert("Sucesso", "Tabela atualizada com sucesso!");
+      fetchTables();
+      setTableName("");
+      setEditingId(null);
+    } catch (error) {
+      console.error("Erro ao editar tabela:", error);
+      Alert.alert("Erro", "Não foi possível editar a tabela.");
+    }
+  };
+
+  const handleDeleteTable = async (id: number) => {
+    Alert.alert("Confirmar", "Deseja realmente excluir esta tabela?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const token = await AsyncStorage.getItem("token");
+            await api.delete(`/tabelas/${id}`, {
+              headers: { Authorization: token ? `Bearer ${token}` : undefined },
+            });
+            Alert.alert("Sucesso", "Tabela excluída com sucesso!");
+            fetchTables();
+          } catch (error) {
+            console.error("Erro ao excluir tabela:", error);
+            Alert.alert("Erro", "Não foi possível excluir a tabela.");
+          }
+        },
+      },
+    ]);
   };
 
   async function exportToPng() {
@@ -254,7 +299,9 @@ export default function TableScreen({ navigation }: TableScreenProps) {
               fontSize: 15,
               fontWeight: "bold",
             }}
-            onPress={handleSaveTable}
+            onPress={
+              editingId ? () => handleUpdateTable(editingId) : handleSaveTable
+            }
           >
             Salvar Tabela
           </Button>
@@ -513,13 +560,45 @@ export default function TableScreen({ navigation }: TableScreenProps) {
           <View style={styles.listSection}>
             <Text style={styles.sectionTitle}>Tabelas de Classificação</Text>
             {tables.map((t) => (
-              <TouchableOpacity
+              <View
                 key={t.id_tabela}
-                style={styles.card}
-                onPress={() => fetchClassificacao(t.id_tabela)}
+                style={[
+                  styles.card,
+                  { flexDirection: "row", alignItems: "center" },
+                ]}
               >
-                <Text style={styles.cardTitle}>{t.nome_tabela}</Text>
-              </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity
+                    onPress={() => fetchClassificacao(t.id_tabela)}
+                  >
+                    <Text style={styles.cardTitle}>{t.nome_tabela}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: "row", marginLeft: 8 }}>
+                  <IconButton
+                    icon={() => (
+                      <MaterialIcons
+                        name="edit"
+                        size={24}
+                        color={colors.primary}
+                      />
+                    )}
+                    containerColor="#E3F2FD"
+                    onPress={() => {
+                      setTableName(t.nome_tabela);
+                      setEditingId(t.id_tabela);
+                    }}
+                  />
+                  <IconButton
+                    icon={() => (
+                      <MaterialIcons name="delete" size={24} color="#FFF" />
+                    )}
+                    containerColor="#E53935"
+                    onPress={() => handleDeleteTable(t.id_tabela)}
+                  />
+                </View>
+              </View>
             ))}
           </View>
         )}

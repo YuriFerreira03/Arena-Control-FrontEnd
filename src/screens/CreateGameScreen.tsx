@@ -518,67 +518,81 @@ export default function CreateGameScreen({ navigation }) {
           </>
         )}
 
-        {/* ---------- MODAL PLACARES ---------- */}
         <Modal
           transparent
           visible={modalJogadoVisible}
           animationType="slide"
           onRequestClose={() => setModalJogadoVisible(false)}
         >
-          <TouchableOpacity
-            style={styles.overlay}
-            activeOpacity={1}
-            onPress={() => setModalJogadoVisible(false)}
-          />
-          <View style={styles.sideMenu}>
-            {selectedJogado &&
-              placares.map((p) => (
-                <View key={p.id_placar} style={styles.card}>
-                  <Text style={styles.sectionTitle}>Período {p.periodo}</Text>
-
-                  <Text style={styles.info}>
-                    Pontos {selectedJogado?.nome_time_a}: {p.pontos_time_a}
-                  </Text>
-                  <Text style={styles.info}>
-                    Pontos {selectedJogado?.nome_time_b}: {p.pontos_time_b}
-                  </Text>
-
-                  <Text style={styles.info}>
-                    Faltas {selectedJogado?.nome_time_a}: {p.set_faltas_a}
-                  </Text>
-                  <Text style={styles.info}>
-                    Faltas {selectedJogado?.nome_time_b}: {p.set_faltas_b}
-                  </Text>
-
-                  <Text style={styles.info}>
-                    Pedido Tempo {selectedJogado?.nome_time_a}:{" "}
-                    {p.pedido_tempo_a}
-                  </Text>
-                  <Text style={styles.info}>
-                    Pedido Tempo {selectedJogado?.nome_time_b}:{" "}
-                    {p.pedido_tempo_b}
-                  </Text>
-                </View>
-              ))}
-
-            {placares.length > 1 && (
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Resultado Final</Text>
-                <Text style={styles.info}>
-                  Pontos {selectedJogado?.nome_time_a}: {totalPontosA}
-                </Text>
-                <Text style={styles.info}>
-                  Pontos {selectedJogado?.nome_time_b}: {totalPontosB}
-                </Text>
-              </View>
-            )}
-
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
             <TouchableOpacity
-              style={styles.menuItem1}
+              style={{ flex: 1 }}
+              activeOpacity={1}
               onPress={() => setModalJogadoVisible(false)}
+            />
+
+            <View
+              style={{
+                maxHeight: "80%",
+                backgroundColor: "white",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                padding: 20,
+              }}
             >
-              <Text style={styles.menuText}>Fechar</Text>
-            </TouchableOpacity>
+              <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+                {selectedJogado &&
+                  placares.map((p) => (
+                    <View key={p.id_placar} style={styles.card}>
+                      <Text style={styles.sectionTitle}>
+                        Período {p.periodo}
+                      </Text>
+
+                      <Text style={styles.info}>
+                        Pontos {selectedJogado?.nome_time_a}: {p.pontos_time_a}
+                      </Text>
+                      <Text style={styles.info}>
+                        Pontos {selectedJogado?.nome_time_b}: {p.pontos_time_b}
+                      </Text>
+
+                      <Text style={styles.info}>
+                        Faltas {selectedJogado?.nome_time_a}: {p.set_faltas_a}
+                      </Text>
+                      <Text style={styles.info}>
+                        Faltas {selectedJogado?.nome_time_b}: {p.set_faltas_b}
+                      </Text>
+
+                      <Text style={styles.info}>
+                        Pedido Tempo {selectedJogado?.nome_time_a}:{" "}
+                        {p.pedido_tempo_a}
+                      </Text>
+                      <Text style={styles.info}>
+                        Pedido Tempo {selectedJogado?.nome_time_b}:{" "}
+                        {p.pedido_tempo_b}
+                      </Text>
+                    </View>
+                  ))}
+
+                {placares.length > 1 && (
+                  <View style={styles.card}>
+                    <Text style={styles.sectionTitle}>Resultado Final</Text>
+                    <Text style={styles.info}>
+                      Pontos {selectedJogado?.nome_time_a}: {totalPontosA}
+                    </Text>
+                    <Text style={styles.info}>
+                      Pontos {selectedJogado?.nome_time_b}: {totalPontosB}
+                    </Text>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  style={styles.menuItem1}
+                  onPress={() => setModalJogadoVisible(false)}
+                >
+                  <Text style={styles.menuText}>Fechar</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
           </View>
         </Modal>
 

@@ -4,12 +4,12 @@
     "slug": "arenacontrol",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/ArenaControl.png",
+    "icon": "./assets/LogoArenaControl.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/ArenaControl.png",
+      "image": "./assets/LogoArenaControl.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#003366"
     },
     "extra": {
       "apiUrl": "http://192.168.1.76:3000",
@@ -35,12 +35,12 @@
         "android.permission.BLUETOOTH_CONNECT"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/ArenaControl.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/LogoArenaControl.png",
+        "backgroundColor": "#003366"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/LogoArenaControl.png"
     },
     "plugins": [
       [

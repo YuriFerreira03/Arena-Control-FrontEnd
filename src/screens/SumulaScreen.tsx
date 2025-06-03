@@ -952,6 +952,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
         <Controller
           control={control}
           name="teamA"
+          rules={{ required: "Time A é obrigatório" }}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               label="Equipe A"
@@ -960,6 +961,7 @@ export default function SumulaScreen({ navigation }: SumulaScreenProps) {
               onChangeText={onChange}
               onBlur={onBlur}
               style={styles.input}
+              error={!!errors.teamB}
             />
           )}
         />

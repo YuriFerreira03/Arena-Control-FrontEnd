@@ -113,6 +113,7 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
       </View>
+      <Text style={styles.credits}>© 2025 Yuri Ferreira</Text>
     </KeyboardAvoidingView>
   );
 }
@@ -185,5 +186,12 @@ const styles = StyleSheet.create({
     fontSize: 35,
     marginTop: -30,
     marginBottom: 8,
+  },
+  credits: {
+    textAlign: "center",
+    color: "#eee",
+    fontSize: 12,
+    marginBottom: 20,
+    marginTop: 5,
   },
 });
