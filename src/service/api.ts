@@ -4,7 +4,11 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const baseURL = Constants.manifest?.extra?.apiUrl ?? 'http://192.168.1.69:3000';
-const baseURL = Constants.manifest?.extra?.apiUrl ?? 'http://172.30.0.12:3000';
+// const baseURL = Constants.manifest?.extra?.apiUrl ?? 'http://172.30.0.12:3000';
+const baseURL = Constants.expoConfig?.extra?.apiUrl ?? "https://arenacontrol.linceonline.com.br";
+console.log("API_URL no standalone:", baseURL);
+
+
 
 const API = axios.create({
   baseURL,

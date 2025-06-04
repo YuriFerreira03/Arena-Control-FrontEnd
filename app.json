@@ -12,7 +12,7 @@
       "backgroundColor": "#003366"
     },
     "extra": {
-      "apiUrl": "http://192.168.1.76:3000",
+      "apiUrl": "https://arenacontrol.linceonline.com.br",
       "eas": {
         "projectId": "4578e0f4-c6c7-48c2-8f06-b6d2ab11de7e"
       }
@@ -24,6 +24,7 @@
     "android": {
       "package": "com.yuriferreira.arenacontrol",
       "permissions": [
+        "INTERNET",
         "BLUETOOTH",
         "BLUETOOTH_ADMIN",
         "BLUETOOTH_CONNECT",
@@ -37,6 +38,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/LogoArenaControl.png",
         "backgroundColor": "#003366"
+      },
+      "config": {
+      "networkSecurityConfig": "./network_security_config.xml"
       }
     },
     "web": {

@@ -35,14 +35,25 @@ export default function LoginScreen({ navigation }: any) {
 
   const onSubmit = async (data: any) => {
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, data, {
-        headers: { "Content-Type": "application/json;charset=utf-8" },
-      });
+      // Teste de conectividade genérico
+      try {
+        const teste = await fetch("https://www.google.com");
+        console.log("Conectividade OK:", teste.status);
+      } catch (e: any) {
+        console.log("Falha de conexão geral:", e.message);
+        // Se quiser, pode abortar aqui:
+        // return;
+      }
 
+      // Chamada ao seu backend
+      const res = await axios.post(`${API_URL}/auth/login`, data);
       await AsyncStorage.setItem("token", res.data.access_token);
       navigation.navigate("Home", { user: res.data.user });
     } catch (err: any) {
-      alert("Erro: " + (err?.response?.data?.message || "Erro desconhecido"));
+      console.log("Erro completo:", err);
+      console.log("Status erro:", err.response?.status);
+      console.log("Corpo erro:", err.response?.data);
+      alert("Erro: " + (err.response?.data?.message || "Erro desconhecido"));
     }
   };
 
